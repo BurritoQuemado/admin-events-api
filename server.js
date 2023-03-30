@@ -18,6 +18,33 @@ const app = express();
 app.use(bodyParser.json());
 app.use(cors());
 
+//Get Events info from database
+app.get('/getevents', (req, res) => {
+    db.select('id', 'name', 'date', 'place').from('events')
+    .then(data => {
+        res.json(data)
+    })
+});
+
+//Get Event Attendees info from database
+app.get('/getAttendees/:id', (req, res) => {
+    const { event_id } = req.params;
+
+    if(isNaN(id)) {
+        return res.status(400).json('Error on event ID')
+    } else {
+        db.select('id', 'name', 'lastname', 'professional_code').from('attendees')
+        .where('event_id', '=', event_id)
+        .then(users => {
+            if(users.length) {
+                res.json(users);
+            } else {
+                res.status(404).json('No attendees found');
+            }
+        })
+    } 
+});
+
 app.get('/', (req, res) => {
     res.json('up and running')
 });
