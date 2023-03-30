@@ -1,0 +1,24 @@
+{
+  "name": "event-backend",
+  "version": "1.0.0",
+  "description": "Server side for events management project made with NodeJS",
+  "main": "index.js",
+  "scripts": {
+    "start": "node server.js",
+    "start:dev": "nodemon server.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/PolarMultimedia/events-attendees-management-backend.git"
+  },
+  "keywords": [
+    "NodeJS",
+    "Express"
+  ],
+  "author": "Diego Flores",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/PolarMultimedia/events-attendees-management-backend/issues"
+  },
+  "homepage": "https://github.com/PolarMultimedia/events-attendees-management-backend#readme"
+}
