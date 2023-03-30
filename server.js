@@ -45,6 +45,23 @@ app.get('/getAttendees/:id', (req, res) => {
     } 
 });
 
+//Insert event attendees into database
+app.post('/registerAttendees', (req, res) => {
+    const { users } = req.body;
+
+    if(!users.length){
+        return res.status(404).json('No attendees to register found');
+    } else {
+        users.forEach(user => {
+            db.transaction(trx => {
+                trx.insert({
+
+                })
+            })
+        });
+    }
+});
+
 app.get('/', (req, res) => {
     res.json('up and running')
 });
