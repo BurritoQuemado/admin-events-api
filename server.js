@@ -33,7 +33,7 @@ app.get('/getAttendees/:id', (req, res) => {
     if(isNaN(id)) {
         return res.status(400).json('Error on event ID')
     } else {
-        db.select('id', 'name', 'lastname', 'professional_code').from('attendees')
+        db.select('id', 'name', 'lastname', 'code', 'profesional_code').from('attendees')
         .where('event_id', '=', event_id)
         .then(users => {
             if(users.length) {
@@ -47,7 +47,8 @@ app.get('/getAttendees/:id', (req, res) => {
 
 //Insert event attendees into database
 app.post('/registerAttendees', (req, res) => {
-    const { users } = req.body;
+    const { users, event_id } = req.body;
+    const timestamp = Date.now();
 
     if(!users.length){
         return res.status(404).json('No attendees to register found');
@@ -55,10 +56,30 @@ app.post('/registerAttendees', (req, res) => {
         users.forEach(user => {
             db.transaction(trx => {
                 trx.insert({
-
+                    name: user.name,
+                    lastname: user.lastname,
+                    code: user.code,
+                    profesional_code: user.profesional_code,
+                    event_id: event_id,
+                    created_at: timestamp,
+                    updated_at: timestamp,
                 })
+                .into('event_attendees')
+                .then(trx.commit)
+                .then(trx.rollback)
             })
+            .catch(err => res.status(400).json('Error inserting attendees into database: ' + err.message))
         });
+    }
+});
+
+app.post('./registerAttendance', (req, res) => {
+    const { user_id } = req.body;
+    
+    if(!user_id.length){
+        return res.status(404).json('No attendees to register found');
+    } else {
+        db.transaction()
     }
 });
 
