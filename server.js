@@ -16,6 +16,14 @@ const app = express();
 app.use(bodyParser.json());
 app.use(cors());
 
+//Get tours info from database
+app.get('/getTours', (req, res) => {
+    db.select('id', 'name').from('tours')
+    .then(data => {
+        res.json(data)
+    })
+});
+
 //Insert tours into database
 app.post('/addTour', (req, res) => {
     const { name } = req.body;
@@ -112,6 +120,7 @@ app.post('/registerAttendees', (req, res) => {
     }
 });
 
+//Update attendance of evente attendee
 app.post('/registerAttendance', (req, res) => {
     const { user_id } = req.body;
     const timestamp = new Date();
@@ -129,6 +138,8 @@ app.post('/registerAttendance', (req, res) => {
         .catch(err => res.status(400).json('Error updating attendance status'+ err.message))
     }
 });
+
+//Check server status
 app.get('/', (req, res) => {
     res.json('up and running')
 });
