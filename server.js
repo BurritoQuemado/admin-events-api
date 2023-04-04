@@ -6,10 +6,8 @@ const knex = require('knex');
 const db = knex({
     client: 'pg',
     connection: {
-        connectionString: process.env.DATABASE_URL || '127.0.0.1',
-        ssl: {
-            rejectUnauthorized: false
-        }
+        connectionString: process.env.DATABASE_URL || 'postgresql://@localhost:5432/events',
+        ssl: process.env.DATABASE_URL ? true : false
     }
 });
 
@@ -18,22 +16,62 @@ const app = express();
 app.use(bodyParser.json());
 app.use(cors());
 
+//Insert tours into database
+app.post('/addTour', (req, res) => {
+    const { name } = req.body;
+    const timestamp = new Date();
+
+    db.transaction(trx => {
+        trx.insert({
+            name: name,
+            created_at: timestamp,
+            updated_at: timestamp
+        })
+        .into('tours')
+        .then(trx.commit)
+        .then(trx.rollback)
+        .then(res.json('tour inserted successfully'))
+    })
+    .catch(err => res.status(400).json('Error inserting tour into database: ' + err.message))
+});
+
+//Insert events into database
+app.post('/addEvent', (req, res) => {
+    const { city, date, tour_id } = req.body;
+    const timestamp = new Date();
+
+    db.transaction(trx => {
+        trx.insert({
+            city: city,
+            date: date,
+            tour_id: tour_id,
+            created_at: timestamp,
+            updated_at: timestamp
+        })
+        .into('events')
+        .then(trx.commit)
+        .then(trx.rollback)
+        .then(res.json('event inserted successfully'))
+    })
+    .catch(err => res.status(400).json('Error inserting event into database: ' + err.message))
+});
+
 //Get Events info from database
 app.get('/getevents', (req, res) => {
-    db.select('id', 'name', 'date', 'place').from('events')
+    db.select('id', 'city', 'date').from('events')
     .then(data => {
         res.json(data)
     })
 });
 
-//Get Event Attendees info from database
-app.get('/getAttendees/:id', (req, res) => {
-    const { event_id } = req.params;
+//Get Event Attendees info from database    
+app.get('/getAttendees', (req, res) => {
+    const { event_id } = req.body;
 
-    if(isNaN(id)) {
+    if(isNaN(event_id)) {
         return res.status(400).json('Error on event ID')
     } else {
-        db.select('id', 'name', 'lastname', 'code', 'profesional_code').from('attendees')
+        db.select('id', 'name', 'lastname', 'code', 'professional_code', 'attendance').from('attendees')
         .where('event_id', '=', event_id)
         .then(users => {
             if(users.length) {
@@ -48,7 +86,7 @@ app.get('/getAttendees/:id', (req, res) => {
 //Insert event attendees into database
 app.post('/registerAttendees', (req, res) => {
     const { users, event_id } = req.body;
-    const timestamp = Date.now();
+    const timestamp = new Date();
 
     if(!users.length){
         return res.status(404).json('No attendees to register found');
@@ -59,30 +97,38 @@ app.post('/registerAttendees', (req, res) => {
                     name: user.name,
                     lastname: user.lastname,
                     code: user.code,
-                    profesional_code: user.profesional_code,
+                    professional_code: user.professional_code,
                     event_id: event_id,
                     created_at: timestamp,
                     updated_at: timestamp,
                 })
-                .into('event_attendees')
+                .into('attendees')
                 .then(trx.commit)
                 .then(trx.rollback)
             })
             .catch(err => res.status(400).json('Error inserting attendees into database: ' + err.message))
         });
+        return res.json('attendees inserted successfully');
     }
 });
 
-app.post('./registerAttendance', (req, res) => {
+app.post('/registerAttendance', (req, res) => {
     const { user_id } = req.body;
+    const timestamp = new Date();
     
     if(!user_id.length){
         return res.status(404).json('No attendees to register found');
     } else {
-        db.transaction()
+        db('attendees')
+        .update({
+            attendance: true,
+            updated_at: timestamp
+        })
+        .where('id',"=", user_id)
+        .then(res.json('updated successfully'))
+        .catch(err => res.status(400).json('Error updating attendance status'+ err.message))
     }
 });
-
 app.get('/', (req, res) => {
     res.json('up and running')
 });
