@@ -20,7 +20,7 @@ app.use(cors());
 app.get('/getTours', (req, res) => {
     db.select('id', 'name').from('tours')
     .then(data => {
-        res.json(data)
+        res.status(200).json(data)
     })
 });
 
@@ -38,7 +38,7 @@ app.post('/addTour', (req, res) => {
         .into('tours')
         .then(trx.commit)
         .then(trx.rollback)
-        .then(res.json('tour inserted successfully'))
+        .then(res.status(200).json('tour inserted successfully'))
     })
     .catch(err => res.status(400).json('Error inserting tour into database: ' + err.message))
 });
@@ -57,7 +57,7 @@ app.post('/updateTourInfo', (req, res) => {
             updated_at: timestamp
         })
         .where('id',"=", tour_id)
-        .then(res.json('updated tour name successfully'))
+        .then(res.status(200).json('updated tour name successfully'))
         .catch(err => res.status(400).json('Error updating tour name '+ err.message))
     }
 });
@@ -78,7 +78,7 @@ app.post('/addEvent', (req, res) => {
         .into('events')
         .then(trx.commit)
         .then(trx.rollback)
-        .then(res.json('event inserted successfully'))
+        .then(res.status(200).json('event inserted successfully'))
     })
     .catch(err => res.status(400).json('Error inserting event into database: ' + err.message))
 });
@@ -87,7 +87,7 @@ app.post('/addEvent', (req, res) => {
 app.get('/getevents', (req, res) => {
     db.select('id', 'city', 'date').from('events')
     .then(data => {
-        res.json(data)
+        res.status(200).json(data)
     })
 });
 
@@ -106,8 +106,8 @@ app.post('/updateEventInfo', (req, res) => {
             updated_at: timestamp
         })
         .where('id',"=", event_id)
-        .then(res.json('updated tour name successfully'))
-        .catch(err => res.status(400).json('Error updating tour name '+ err.message))
+        .then(res.status(200).json('updated event info successfully'))
+        .catch(err => res.status(400).json('Error updating event info '+ err.message))
     }
 });
 
@@ -122,7 +122,7 @@ app.get('/getAttendees', (req, res) => {
         .where('event_id', '=', event_id)
         .then(users => {
             if(users.length) {
-                res.json(users);
+                res.status(200).json(users);
             } else {
                 res.status(404).json('No attendees found');
             }
@@ -155,7 +155,7 @@ app.post('/registerAttendees', (req, res) => {
             })
             .catch(err => res.status(400).json('Error inserting attendees into database: ' + err.message))
         });
-        return res.json('attendees inserted successfully');
+        return res.status(200).json('attendees inserted successfully');
     }
 });
 
@@ -173,7 +173,7 @@ app.post('/registerAttendance', (req, res) => {
             updated_at: timestamp
         })
         .where('id',"=", user_id)
-        .then(res.json('updated attendance successfully'))
+        .then(res.status(200).json('updated attendance successfully'))
         .catch(err => res.status(400).json('Error updating attendance status'+ err.message))
     }
 });
@@ -192,14 +192,14 @@ app.post('/updateAttendeeProfessionalCode', (req, res) => {
             updated_at: timestamp
         })
         .where('id',"=", user_id)
-        .then(res.json('updated professional code successfully'))
+        .then(res.status(200).json('updated professional code successfully'))
         .catch(err => res.status(400).json('Error updating professional code status'+ err.message))
     }
 });
 
 //Check server status
 app.get('/', (req, res) => {
-    res.json('up and running')
+    res.status(200).json('up and running')
 });
 
 app.listen(process.env.PORT || 3000, () => {
