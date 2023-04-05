@@ -43,6 +43,25 @@ app.post('/addTour', (req, res) => {
     .catch(err => res.status(400).json('Error inserting tour into database: ' + err.message))
 });
 
+//Update tour information
+app.post('/updateTourInfo', (req, res) => {
+    const { tour_id, name } = req.body;
+    const timestamp = new Date();
+    
+    if(!tour_id.length){
+        return res.status(404).json('No tour to update found');
+    } else {
+        db('tours')
+        .update({
+            name: name,
+            updated_at: timestamp
+        })
+        .where('id',"=", tour_id)
+        .then(res.json('updated tour name successfully'))
+        .catch(err => res.status(400).json('Error updating tour name '+ err.message))
+    }
+});
+
 //Insert events into database
 app.post('/addEvent', (req, res) => {
     const { city, date, tour_id } = req.body;
@@ -70,6 +89,26 @@ app.get('/getevents', (req, res) => {
     .then(data => {
         res.json(data)
     })
+});
+
+//Update Eventos info
+app.post('/updateEventInfo', (req, res) => {
+    const { event_id, city, date } = req.body;
+    const timestamp = new Date();
+    
+    if(!event_id.length){
+        return res.status(404).json('No event to update found');
+    } else {
+        db('events')
+        .update({
+            city: city,
+            date: date,
+            updated_at: timestamp
+        })
+        .where('id',"=", event_id)
+        .then(res.json('updated tour name successfully'))
+        .catch(err => res.status(400).json('Error updating tour name '+ err.message))
+    }
 });
 
 //Get Event Attendees info from database    
@@ -134,8 +173,27 @@ app.post('/registerAttendance', (req, res) => {
             updated_at: timestamp
         })
         .where('id',"=", user_id)
-        .then(res.json('updated successfully'))
+        .then(res.json('updated attendance successfully'))
         .catch(err => res.status(400).json('Error updating attendance status'+ err.message))
+    }
+});
+
+//Update attendee professional_code
+app.post('/updateAttendeeProfessionalCode', (req, res) => {
+    const { user_id, professional_code } = req.body;
+    const timestamp = new Date();
+    
+    if(!user_id.length){
+        return res.status(404).json('No tour to update found');
+    } else {
+        db('attendees')
+        .update({
+            professional_code: professional_code,
+            updated_at: timestamp
+        })
+        .where('id',"=", user_id)
+        .then(res.json('updated professional code successfully'))
+        .catch(err => res.status(400).json('Error updating professional code status'+ err.message))
     }
 });
 
