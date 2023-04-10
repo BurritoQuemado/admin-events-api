@@ -83,9 +83,21 @@ app.post('/addEvent', (req, res) => {
     .catch(err => res.status(400).json('Error inserting event into database: ' + err.message))
 });
 
+//Get Tour info from database
+app.get('/getTour/:tour_id', (req, res) => {
+    const { tour_id } = req.params;
+    db.select('id', 'name').from('tours')
+    .where('id', tour_id)
+    .then(data => {
+        res.status(200).json(data)
+    })
+});
+
 //Get Events info from database
-app.get('/getevents', (req, res) => {
+app.get('/getEvents/:tour_id', (req, res) => {
+    const { tour_id } = req.params;
     db.select('id', 'city', 'date').from('events')
+    .where('tour_id', tour_id)
     .then(data => {
         res.status(200).json(data)
     })
@@ -112,8 +124,8 @@ app.post('/updateEventInfo', (req, res) => {
 });
 
 //Get Event Attendees info from database    
-app.get('/getAttendees', (req, res) => {
-    const { event_id } = req.body;
+app.get('/getAttendees/:event_id', (req, res) => {
+    const { event_id } = req.params;
 
     if(isNaN(event_id)) {
         return res.status(400).json('Error on event ID')
@@ -122,6 +134,7 @@ app.get('/getAttendees', (req, res) => {
         .where('event_id', '=', event_id)
         .then(users => {
             if(users.length) {
+                console.log('Sent attendees list');
                 res.status(200).json(users);
             } else {
                 res.status(404).json('No attendees found');
