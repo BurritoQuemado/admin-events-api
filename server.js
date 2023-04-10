@@ -93,6 +93,16 @@ app.get('/getTour/:tour_id', (req, res) => {
     })
 });
 
+//Get Event city from database
+app.get('/getEvent/:event_id', (req, res) => {
+    const { event_id } = req.params;
+    db.select('id', 'city', 'tour_id').from('events')
+    .where('id', event_id)
+    .then(data => {
+        res.status(200).json(data)
+    })
+});
+
 //Get Events info from database
 app.get('/getEvents/:tour_id', (req, res) => {
     const { tour_id } = req.params;
@@ -192,7 +202,7 @@ app.post('/registerAttendance', (req, res) => {
 });
 
 //Update attendee professional_code
-app.post('/updateAttendeeProfessionalCode', (req, res) => {
+app.put('/updateAttendeeProfessionalCode', (req, res) => {
     const { user_id, professional_code } = req.body;
     const timestamp = new Date();
     
@@ -208,6 +218,16 @@ app.post('/updateAttendeeProfessionalCode', (req, res) => {
         .then(res.status(200).json('updated professional code successfully'))
         .catch(err => res.status(400).json('Error updating professional code status'+ err.message))
     }
+});
+
+//Get attendee info
+app.get('/getAttendee/:attendee_id', (req, res) => {
+    const { attendee_id } = req.params;
+    db.select('id', 'name','lastname','professional_code', 'attendance', 'event_id').from('attendees')
+    .where('id', attendee_id)
+    .then(data => {
+        res.status(200).json(data)
+    })
 });
 
 //Check server status
