@@ -158,7 +158,7 @@ app.post('/registerAttendees', (req, res) => {
     const { users, event_id } = req.body;
     const timestamp = new Date();
 
-    if(!users.length){
+    if(!users.length || !event_id){
         return res.status(404).json('No attendees to register found');
     } else {
         users.forEach(user => {
@@ -179,6 +179,43 @@ app.post('/registerAttendees', (req, res) => {
             .catch(err => res.status(400).json('Error inserting attendees into database: ' + err.message))
         });
         return res.status(200).json('attendees inserted successfully');
+    }
+});
+
+app.get('/getTourEvent', (req, res) => {
+    const { event_id } = req.body; 
+    db('events').join('tours', 'events.tour_id','tours.id')
+    .select('events.city','tours.name')
+    .where('events.id', event_id)
+    .then(resp => {
+        res.status(200).json(resp);
+    });
+});
+
+//Insert event attendees into database
+app.post('/registerAttendee', (req, res) => {
+    const { user, event_id } = req.body;
+    const timestamp = new Date();
+
+    if(!user|| !event_id){
+        return res.status(404).json('No attendees to register found');
+    } else {
+        db.transaction(trx => {
+            trx.insert({
+                name: user.name,
+                lastname: user.lastname,
+                code: 'invitadoExtra',
+                professional_code: user.professional_code,
+                attendance: true,
+                event_id: event_id,
+                created_at: timestamp,
+                updated_at: timestamp,
+            })
+            .into('attendees')
+            .then(trx.commit)
+            .then(trx.rollback)
+        })
+        return res.status(200).json('attendee inserted successfully');
     }
 });
 
