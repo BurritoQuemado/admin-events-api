@@ -64,13 +64,12 @@ app.post('/updateTourInfo', (req, res) => {
 
 //Insert events into database
 app.post('/addEvent', (req, res) => {
-    const { city, date, tour_id } = req.body;
+    const { name, tour_id } = req.body;
     const timestamp = new Date();
 
     db.transaction(trx => {
         trx.insert({
-            city: city,
-            date: date,
+            name: name,
             tour_id: tour_id,
             created_at: timestamp,
             updated_at: timestamp
@@ -93,10 +92,10 @@ app.get('/getTour/:tour_id', (req, res) => {
     })
 });
 
-//Get Event city from database
+//Get Event name from database
 app.get('/getEvent/:event_id', (req, res) => {
     const { event_id } = req.params;
-    db.select('id', 'city', 'tour_id').from('events')
+    db.select('id', 'name', 'tour_id').from('events')
     .where('id', event_id)
     .then(data => {
         res.status(200).json(data)
@@ -106,7 +105,7 @@ app.get('/getEvent/:event_id', (req, res) => {
 //Get Events info from database
 app.get('/getEvents/:tour_id', (req, res) => {
     const { tour_id } = req.params;
-    db.select('id', 'city', 'date').from('events')
+    db.select('id', 'name').from('events')
     .where('tour_id', tour_id)
     .then(data => {
         res.status(200).json(data)
@@ -115,7 +114,7 @@ app.get('/getEvents/:tour_id', (req, res) => {
 
 //Update Eventos info
 app.post('/updateEventInfo', (req, res) => {
-    const { event_id, city, date } = req.body;
+    const { event_id, name} = req.body;
     const timestamp = new Date();
     
     if(!event_id.length){
@@ -123,8 +122,7 @@ app.post('/updateEventInfo', (req, res) => {
     } else {
         db('events')
         .update({
-            city: city,
-            date: date,
+            name: name,
             updated_at: timestamp
         })
         .where('id',"=", event_id)
@@ -140,7 +138,7 @@ app.get('/getAttendees/:event_id', (req, res) => {
     if(isNaN(event_id)) {
         return res.status(400).json('Error on event ID')
     } else {
-        db.select('id', 'name', 'lastname', 'code', 'professional_code', 'attendance').from('attendees')
+        db.select('id', 'name', 'code', 'professional_code', 'attendance').from('attendees')
         .where('event_id', '=', event_id)
         .then(users => {
             if(users.length) {
@@ -165,7 +163,6 @@ app.post('/registerAttendees', (req, res) => {
             db.transaction(trx => {
                 trx.insert({
                     name: user.name,
-                    lastname: user.lastname,
                     code: user.code,
                     professional_code: user.professional_code,
                     event_id: event_id,
@@ -185,7 +182,7 @@ app.post('/registerAttendees', (req, res) => {
 app.get('/getTourEvent', (req, res) => {
     const { event_id } = req.body; 
     db('events').join('tours', 'events.tour_id','tours.id')
-    .select('events.city','tours.name')
+    .select('events.name','tours.name')
     .where('events.id', event_id)
     .then(resp => {
         res.status(200).json(resp);
@@ -203,7 +200,6 @@ app.post('/registerAttendee', (req, res) => {
         db.transaction(trx => {
             trx.insert({
                 name: user.name,
-                lastname: user.lastname,
                 code: 'invitadoExtra',
                 professional_code: user.professional_code,
                 attendance: true,
@@ -215,6 +211,7 @@ app.post('/registerAttendee', (req, res) => {
             .then(trx.commit)
             .then(trx.rollback)
         })
+        console.log('attendee inserted');
         return res.status(200).json('attendee inserted successfully');
     }
 });
@@ -233,7 +230,10 @@ app.post('/registerAttendance', (req, res) => {
             updated_at: timestamp
         })
         .where('id',"=", user_id)
-        .then(res.status(200).json('updated attendance successfully'))
+        .then(res => {
+            console.log('attendee attendance updated');
+            return res.status(200).json('updated attendance successfully');
+        })
         .catch(err => res.status(400).json('Error updating attendance status'+ err.message))
     }
 });
@@ -260,7 +260,7 @@ app.put('/updateAttendeeProfessionalCode', (req, res) => {
 //Get attendee info
 app.get('/getAttendee/:attendee_id', (req, res) => {
     const { attendee_id } = req.params;
-    db.select('id', 'name','lastname','professional_code', 'attendance', 'event_id').from('attendees')
+    db.select('id', 'name','professional_code', 'attendance', 'event_id').from('attendees')
     .where('id', attendee_id)
     .then(data => {
         res.status(200).json(data)

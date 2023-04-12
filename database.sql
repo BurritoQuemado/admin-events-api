@@ -2,15 +2,14 @@ CREATE TABLE IF NOT EXISTS events;
 
 CREATE TABLE IF NOT EXISTS tours (
     id SERIAL PRIMARY KEY,
-    name VARCHAR(100) NOT NULL,
+    name VARCHAR(254) NOT NULL,
     created_at TIMESTAMP NOT NULL,
     updated_at TIMESTAMP NOT NULL
 );
 
 CREATE TABLE IF NOT EXISTS events(
     id SERIAL PRIMARY KEY,
-    city VARCHAR(100) NOT NULL,
-    date TIMESTAMP NOT NULL,
+    name VARCHAR(254) NOT NULL,
     created_at TIMESTAMP NOT NULL,
     updated_at TIMESTAMP NOT NULL,
     tour_id SERIAL,
@@ -19,8 +18,7 @@ CREATE TABLE IF NOT EXISTS events(
 
 CREATE TABLE IF NOT EXISTS attendees (
     id SERIAL PRIMARY KEY,
-    name VARCHAR(100) NOT NULL,
-    lastname VARCHAR(100) NOT NULL,
+    name VARCHAR(254) NOT NULL,
     code VARCHAR(100) NOT NULL,
     professional_code INT NOT NULL,
     created_at TIMESTAMP NOT NULL,
