@@ -22,7 +22,7 @@ CREATE TABLE IF NOT EXISTS attendees (
     code VARCHAR(100) NOT NULL,
     professional_code INT NOT NULL,
     created_at TIMESTAMP NOT NULL,
-    updated_at TIMESTAMP NOT NULL,
+    updated_at TIMESTAMP,
     attendance BOOLEAN DEFAULT FALSE,
     event_id SERIAL,
     FOREIGN KEY (event_id) REFERENCES events (id)

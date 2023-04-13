@@ -169,7 +169,6 @@ app.post('/registerAttendees', (req, res) => {
                     professional_code: user.professional_code,
                     event_id: event_id,
                     created_at: timestamp,
-                    updated_at: timestamp,
                 })
                 .into('attendees')
                 .then(trx.commit)
