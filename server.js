@@ -29,7 +29,7 @@ app.get('/getTours', (req, res) => {
 //Insert tours into database
 app.post('/addTour', (req, res) => {
     const { name } = req.body;
-    const timestamp = new Date();
+    const timestamp = new Date().toLocaleString('es-MX', { timeZone: 'America/Mexico_City'});
 
     db.transaction(trx => {
         trx.insert({
@@ -48,7 +48,7 @@ app.post('/addTour', (req, res) => {
 //Update tour information
 app.post('/updateTourInfo', (req, res) => {
     const { tour_id, name } = req.body;
-    const timestamp = new Date();
+    const timestamp = new Date().toLocaleString('es-MX', { timeZone: 'America/Mexico_City'});
     
     if(!tour_id.length){
         return res.status(404).json('No tour to update found');
@@ -67,7 +67,7 @@ app.post('/updateTourInfo', (req, res) => {
 //Insert events into database
 app.post('/addEvent', (req, res) => {
     const { name, tour_id } = req.body;
-    const timestamp = new Date();
+    const timestamp = new Date().toLocaleString('es-MX', { timeZone: 'America/Mexico_City'});
 
     db.transaction(trx => {
         trx.insert({
@@ -117,7 +117,7 @@ app.get('/getEvents/:tour_id', (req, res) => {
 //Update Eventos info
 app.post('/updateEventInfo', (req, res) => {
     const { event_id, name} = req.body;
-    const timestamp = new Date();
+    const timestamp = new Date().toLocaleString('es-MX', { timeZone: 'America/Mexico_City'});
     
     if(!event_id.length){
         return res.status(404).json('No event to update found');
@@ -140,7 +140,7 @@ app.get('/getAttendees/:event_id', (req, res) => {
     if(isNaN(event_id)) {
         return res.status(400).json('Error on event ID')
     } else {
-        db.select('id', 'name', 'code', 'professional_code', 'attendance').from('attendees')
+        db.select('id', 'name', 'code', 'professional_code', 'attendance', 'updated_at').from('attendees')
         .where('event_id', '=', event_id)
         .then(users => {
             if(users.length) {
@@ -156,7 +156,7 @@ app.get('/getAttendees/:event_id', (req, res) => {
 //Insert event attendees into database
 app.post('/registerAttendees', (req, res) => {
     const { users, event_id } = req.body;
-    const timestamp = new Date();
+    const timestamp = new Date().toLocaleString('es-MX', { timeZone: 'America/Mexico_City'});
 
     if(!users.length || !event_id){
         return res.status(404).json('No attendees to register found');
@@ -194,7 +194,7 @@ app.get('/getTourEvent', (req, res) => {
 //Insert event attendees into database
 app.post('/registerAttendee', (req, res) => {
     const { user, event_id } = req.body;
-    const timestamp = new Date();
+    const timestamp = new Date().toLocaleString('es-MX', { timeZone: 'America/Mexico_City'});
 
     if(!user|| !event_id){
         return res.status(404).json('No attendees to register found');
@@ -221,7 +221,7 @@ app.post('/registerAttendee', (req, res) => {
 //Update attendance of evente attendee
 app.post('/registerAttendance', (req, res) => {
     const { user_id } = req.body;
-    const timestamp = new Date();
+    const timestamp = new Date().toLocaleString('es-MX', { timeZone: 'America/Mexico_City'});
     
     if(!user_id.length){
         return res.status(404).json('No attendees to register found');
@@ -243,7 +243,7 @@ app.post('/registerAttendance', (req, res) => {
 //Update attendee professional_code
 app.put('/updateAttendeeProfessionalCode', (req, res) => {
     const { user_id, professional_code } = req.body;
-    const timestamp = new Date();
+    const timestamp = new Date().toLocaleString('es-MX', { timeZone: 'America/Mexico_City'});
     
     if(!user_id.length){
         return res.status(404).json('No tour to update found');
