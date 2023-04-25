@@ -269,6 +269,46 @@ app.get('/getAttendee/:attendee_id', (req, res) => {
     })
 });
 
+//Get Inventory
+app.get('/getInventory', (req, res) => {
+    db.select('*').from('inventory')
+    .then(data => {
+        console.log('Inventory sent')
+        res.status(200).json(data)
+    })
+});
+
+//Add Inventory
+app.post('/addInventory', (req, res) => {
+    const timestamp = new Date();
+    const { inventory } = req.body;
+    if (!inventory || inventory === null){
+        console.err('No inventory to register')
+        res.status(400).json('No hay articulos que registrar');
+    } else {
+        inventory.forEach(item => {
+            db.transaction(trx => {
+                trx.insert({
+                    name: item.name,
+                    code: item.code,
+                    serial_code: item.serial_code,
+                    location: item.location,
+                    stored: item.stored,
+                    description: item.description,
+                    working: true,
+                    created_at: timestamp
+                })
+            })
+        })
+    }
+});
+
+//Add Item to inventory
+
+//Update Item
+
+//Delete Item
+
 //Check server status
 app.get('/', (req, res) => {
     res.status(200).json('up and running')

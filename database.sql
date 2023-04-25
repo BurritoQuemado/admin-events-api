@@ -28,3 +28,16 @@ CREATE TABLE IF NOT EXISTS attendees (
     event_id SERIAL,
     FOREIGN KEY (event_id) REFERENCES events (id)
 );
+
+CREATE TABLE IF NOT EXISTS inventory (
+    id SERIAL PRIMARY KEY,
+    nombre VARCHAR(255) NOT NULL,
+    code VARCHAR(255) NOT NULL,
+    serial_code VARCHAR(255) NOT NULL,
+    location VARCHAR(255) NOT NULL,
+    stored BOOLEAN DEFAULT true,
+    description VARCHAR(1024) NOT NULL,
+    working BOOLEAN DEFAULT true,
+    created_at TIMESTAMPTZ NOT NULL,
+    updated_at TIMESTAMPTZ
+);
