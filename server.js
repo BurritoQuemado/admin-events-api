@@ -364,7 +364,20 @@ app.put('/updateItem', (req, res) => {
         res.status(400).json('Error al actualizar objeto del inventario')
     })
 });
+
 //Delete Item
+app.delete('/deleteItem', (req, res) => {
+    const { id } = req.body;
+    db('inventory')
+    .where('id',id)
+    .del()
+    .then(res.json('Objeto eliminado correctamente'))
+    .then(console.log('Item deleted successfully'))
+    .catch(err => {
+        console.error('Error while deleting item from inventory' + err)
+        res.status(400).json('Error al eliminar objeto del inventario')
+    })
+});
 
 //Check server status
 app.get('/', (req, res) => {
