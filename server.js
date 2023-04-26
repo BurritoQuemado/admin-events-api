@@ -345,7 +345,25 @@ app.post('/addItem', (req, res) => {
 });
 
 //Update Item
-
+app.put('/updateItem', (req, res) => {
+    const { item } = req.body;
+    const timestamp = new Date();
+    db('inventory')
+    .where('id', item.id)
+    .update({
+        name: item.name,
+        location: item.location,
+        stored: item.stored,
+        working: true,
+        updated_at: timestamp,
+    })
+    .then(res.json('Objeto actualizado correctamente'))
+    .then(console.log('Item updated successfully'))
+    .catch(err => {
+        console.error('Error while updating item of inventory' + err)
+        res.status(400).json('Error al actualizar objeto del inventario')
+    })
+});
 //Delete Item
 
 //Check server status
