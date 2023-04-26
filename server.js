@@ -298,12 +298,51 @@ app.post('/addInventory', (req, res) => {
                     working: true,
                     created_at: timestamp
                 })
+                .into('inventory')
+                .then(trx.rollback)
+                .then(trx.commit)
+                .then(res.json('Inventario agregado correctamente'))
+                .then(console.log('Inventory added successfully'))
+            })
+            .catch(err => {
+                console.error('Error while importing inventory' + err)
+                res.status(400).json('Error al importar el inventario')
             })
         })
     }
 });
 
 //Add Item to inventory
+app.post('/addItem', (req, res) => {
+    const timestamp = new Date();
+    const { item } = req.body;
+    if(!item || item === undefined){
+        console.err('No item to add')
+        res.status(400).json('no hay articulo que registrar');
+    } else {
+        db.transaction(trx => {
+            trx.insert({
+                name: item.name,
+                code: item.code,
+                serial_code: item.serial_code,
+                location: item.location,
+                stored: item.stored,
+                description: item.description,
+                working: true,
+                created_at: timestamp
+            })
+            .into('inventory')
+            .then(trx.rollback)
+            .then(trx.commit)
+            .then(res.json('Inventario agregado correctamente'))
+            .then(console.log('Inventory added successfully'))
+        })
+        .catch(err => {
+            console.error('Error while adding item to inventory' + err)
+            res.status(400).json('Error al agregar objeto el inventario')
+        })
+    }
+});
 
 //Update Item
 
