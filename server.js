@@ -206,6 +206,7 @@ app.post('/registerAttendee', (req, res) => {
                 professional_code: user.professional_code,
                 attendance: true,
                 event_id: event_id,
+                confirmation_status: 'Extra',
                 created_at: timestamp,
                 updated_at: timestamp,
             })
