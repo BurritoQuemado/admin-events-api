@@ -234,7 +234,7 @@ app.post('/registerAttendance', (req, res) => {
             updated_at: timestamp
         })
         .where('id',"=", user_id)
-        .then(res => {
+        .then(response => {
             console.log('attendee attendance updated');
             return res.status(200).json('updated attendance successfully');
         })
