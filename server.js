@@ -223,6 +223,7 @@ app.post('/registerAttendee', (req, res) => {
 app.post('/registerAttendance', (req, res) => {
     const { user_id } = req.body;
     const timestamp = new Date();
+    console.log('registering attendance of user ' + user_id);
     
     if(!user_id.length){
         return res.status(404).json('No attendees to register found');
