@@ -6,10 +6,10 @@ const knex = require('knex');
 const db = knex({
     client: 'pg',
     connection: {
-        connectionString: process.env.DATABASE_URL,
-        ssl: {
+        connectionString: process.env.DATABASE_URL || 'postgres://localhost:5432/events',
+/*         ssl: {
             rejectUnauthorized: false
-        }
+        } */
     }
 });
 
@@ -24,6 +24,15 @@ app.get('/getTours', (req, res) => {
     .then(data => {
         res.status(200).json(data)
     })
+});
+
+app.get('/getTourTotalEvents/', (req, res) => {
+        db.raw("select tours.id, tours.name, count(events.id) from events inner join tours on tours.id = events.tour_id group by tours.id;")
+        .then(result => {
+            res.status(200).json(result.rows);
+        })
+        .catch(err => res.json(err));
+    
 });
 
 //Insert tours into database
@@ -196,7 +205,7 @@ app.post('/registerAttendee', (req, res) => {
     const { user, event_id } = req.body;
     const timestamp = new Date().toLocaleString({ timeZone: 'America/Mexico_City'});
 
-    if(!user|| !event_id){
+    if(!user || !event_id){
         return res.status(404).json('No attendees to register found');
     } else {
         db.transaction(trx => {
@@ -205,6 +214,7 @@ app.post('/registerAttendee', (req, res) => {
                 code: 'invitadoExtra',
                 professional_code: user.professional_code,
                 attendance: true,
+                confirmation_status: 'Extra',
                 event_id: event_id,
                 created_at: timestamp,
                 updated_at: timestamp,
