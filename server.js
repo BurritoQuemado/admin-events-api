@@ -6,10 +6,10 @@ const knex = require('knex');
 const db = knex({
     client: 'pg',
     connection: {
-        connectionString: process.env.DATABASE_URL,
-        ssl: {
+        connectionString: process.env.DATABASE_URL || 'postgres://localhost:5432/events',
+/*         ssl: {
             rejectUnauthorized: false
-        }
+        } */
     }
 });
 
@@ -24,6 +24,15 @@ app.get('/getTours', (req, res) => {
     .then(data => {
         res.status(200).json(data)
     })
+});
+
+app.get('/getTourTotalEvents/', (req, res) => {
+        db.raw("select tours.id, tours.name, count(events.id) from events inner join tours on tours.id = events.tour_id group by tours.id;")
+        .then(result => {
+            res.status(200).json(result.rows);
+        })
+        .catch(err => res.json(err));
+    
 });
 
 //Insert tours into database
@@ -196,7 +205,7 @@ app.post('/registerAttendee', (req, res) => {
     const { user, event_id } = req.body;
     const timestamp = new Date().toLocaleString({ timeZone: 'America/Mexico_City'});
 
-    if(!user|| !event_id){
+    if(!user || !event_id){
         return res.status(404).json('No attendees to register found');
     } else {
         db.transaction(trx => {
@@ -205,6 +214,7 @@ app.post('/registerAttendee', (req, res) => {
                 code: 'invitadoExtra',
                 professional_code: user.professional_code,
                 attendance: true,
+                confirmation_status: 'Extra',
                 event_id: event_id,
                 confirmation_status: 'Extra',
                 created_at: timestamp,
@@ -268,6 +278,116 @@ app.get('/getAttendee/:attendee_id', (req, res) => {
     .where('id', attendee_id)
     .then(data => {
         res.status(200).json(data)
+    })
+});
+
+//Get Inventory
+app.get('/getInventory', (req, res) => {
+    db.select('*').from('inventory')
+    .then(data => {
+        console.log('Inventory sent')
+        res.status(200).json(data)
+    })
+});
+
+//Add Inventory
+app.post('/addInventory', (req, res) => {
+    const timestamp = new Date();
+    const { inventory } = req.body;
+    if (!inventory || inventory === null){
+        console.err('No inventory to register')
+        res.status(400).json('No hay articulos que registrar');
+    } else {
+        inventory.forEach(item => {
+            db.transaction(trx => {
+                trx.insert({
+                    name: item.name,
+                    code: item.code,
+                    serial_code: item.serial_code,
+                    location: item.location,
+                    stored: item.stored,
+                    description: item.description,
+                    working: true,
+                    created_at: timestamp
+                })
+                .into('inventory')
+                .then(trx.rollback)
+                .then(trx.commit)
+                .then(res.json('Inventario agregado correctamente'))
+                .then(console.log('Inventory added successfully'))
+            })
+            .catch(err => {
+                console.error('Error while importing inventory' + err)
+                res.status(400).json('Error al importar el inventario')
+            })
+        })
+    }
+});
+
+//Add Item to inventory
+app.post('/addItem', (req, res) => {
+    const timestamp = new Date();
+    const { item } = req.body;
+    if(!item || item === undefined){
+        console.err('No item to add')
+        res.status(400).json('no hay articulo que registrar');
+    } else {
+        db.transaction(trx => {
+            trx.insert({
+                name: item.name,
+                code: item.code,
+                serial_code: item.serial_code,
+                location: item.location,
+                stored: item.stored,
+                description: item.description,
+                working: true,
+                created_at: timestamp
+            })
+            .into('inventory')
+            .then(trx.rollback)
+            .then(trx.commit)
+            .then(res.json('Inventario agregado correctamente'))
+            .then(console.log('Inventory added successfully'))
+        })
+        .catch(err => {
+            console.error('Error while adding item to inventory' + err)
+            res.status(400).json('Error al agregar objeto el inventario')
+        })
+    }
+});
+
+//Update Item
+app.put('/updateItem', (req, res) => {
+    const { item } = req.body;
+    const timestamp = new Date();
+    db('inventory')
+    .where('id', item.id)
+    .update({
+        name: item.name,
+        location: item.location,
+        stored: item.stored,
+        working: true,
+        updated_at: timestamp,
+    })
+    .then(res.json('Objeto actualizado correctamente'))
+    .then(console.log('Item updated successfully'))
+    .catch(err => {
+        console.error('Error while updating item of inventory' + err)
+        res.status(400).json('Error al actualizar objeto del inventario')
+    })
+});
+
+//Delete Item
+app.delete('/deleteItem', (req, res) => {
+    const { id } = req.body;
+    db('inventory')
+    .where('id',id)
+    .del()
+    .then(res.json('Objeto eliminado correctamente'))
+    .then(console.log('Item deleted successfully'))
+    .catch(err => {
+        console.error('Error while deleting item from inventory' + err)
+        res.status(400).json('Error al eliminar objeto del inventario')
     })
 });
 
