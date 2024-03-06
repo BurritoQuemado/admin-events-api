@@ -27,7 +27,7 @@ app.get('/getTours', (req, res) => {
 });
 
 app.get('/getTourTotalEvents/', (req, res) => {
-        db.raw("select tours.id, tours.name, count(events.id) from events inner join tours on tours.id = events.tour_id group by tours.id;")
+        db.raw("select tours.id, tours.name, count(events.id) from events left join tours on tours.id = events.tour_id group by tours.id;")
         .then(result => {
             res.status(200).json(result.rows);
         })
