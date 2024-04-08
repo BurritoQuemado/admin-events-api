@@ -124,7 +124,7 @@ app.get('/getEvents/:tour_id', (req, res) => {
 });
 
 app.get("getTotalEvents", (req, res) => {
-    db.raw("SELECT *,COUNT(*) FROM events")
+    db.raw("SELECT COUNT(*) FROM events")
     .then(result => {
         res.status(200).json(result)
     })
@@ -134,7 +134,7 @@ app.get("getTotalEvents", (req, res) => {
 });
 
 app.get("getTotalAttendees", (req, res) => {
-    db.raw("SELECT *,COUNT(*) FROM attendees")
+    db.raw("SELECT COUNT(*) FROM attendees")
     .then(result => {
         res.status(200).json(result)
     })
