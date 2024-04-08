@@ -123,6 +123,26 @@ app.get('/getEvents/:tour_id', (req, res) => {
     })
 });
 
+app.get("getTotalEvents", (req, res) => {
+    db.raw("SELECT *,COUNT(*) FROM events")
+    .then(result => {
+        res.status(200).json(result)
+    })
+    .catch(err => {
+        console.error(err);
+    })
+});
+
+app.get("getTotalAttendees", (req, res) => {
+    db.raw("SELECT *,COUNT(*) FROM attendees")
+    .then(result => {
+        res.status(200).json(result)
+    })
+    .catch(err => {
+        console.error(err);
+    })
+});
+
 //Update Eventos info
 app.post('/updateEventInfo', (req, res) => {
     const { event_id, name} = req.body;
